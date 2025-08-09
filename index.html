@@ -3,26 +3,44 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Narciso Tema - Bot de Perguntas</title>
+  <title>Narciso Tema</title>
   <link rel="stylesheet" href="style.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Open+Sans:wght@300;400&display=swap" rel="stylesheet">
 </head>
 <body>
-  <div class="container">
-    <h1>Narciso Tema</h1>
-    <p>Um bot simples que responde com base em palavras-chave.</p>
+  <!-- Fundo de partículas -->
+  <div id="particles-js"></div>
 
-    <div class="chat-box" id="chatBox">
-      <p><strong>Bot:</strong> Olá! Como posso ajudar você?</p>
-    </div>
+  <div class="app-container">
+    <header>
+      <h1>Narciso Tema</h1>
+      <p>Um espelho que pensa. Uma mente que reflete.</p>
+      <button id="themeToggle">🌙 Modo Escuro</button>
+    </header>
 
-    <div class="input-area">
-      <input type="text" id="userInput" placeholder="Digite sua pergunta..." />
-      <button id="sendBtn">Enviar</button>
-    </div>
+    <main>
+      <div class="chat-container" id="chatBox">
+        <p class="bot"><strong>Bot:</strong> Olá, buscador. Sou Narciso Tema. Não me apaixono por rostos, mas por ideias. Pergunte-me algo.</p>
+      </div>
+
+      <div class="input-area">
+        <input type="text" id="userInput" placeholder="Pergunte ao espelho..." />
+        <button id="sendBtn">Enviar</button>
+        <button id="voiceBtn" title="Falar">🎤</button>
+      </div>
+    </main>
+
+    <footer>
+      <p>Narciso Tema – Uma jornada interior | <span id="memoryCount">0</span> mensagens lembradas</p>
+    </footer>
   </div>
 
+  <!-- Particles.js -->
+  <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
   <!-- TensorFlow.js -->
-  <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.20.0"></script>
+  <!-- Web Speech Polyfill -->
+  <script src="https://cdn.jsdelivr.net/npm/web-speech-cognitive-services@latest/lib/speech-sdk.js"></script>
   <script src="script.js"></script>
 </body>
 </html>
