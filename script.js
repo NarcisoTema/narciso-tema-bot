@@ -1,10 +1,10 @@
-// Simulação simples de modelo de palavras-chave com TF.js (sem treinamento real, mas usando TF para tokenização básica)
+// script.js
 document.addEventListener("DOMContentLoaded", () => {
   const chatBox = document.getElementById("chatBox");
   const userInput = document.getElementById("userInput");
   const sendBtn = document.getElementById("sendBtn");
 
-  // Função para adicionar mensagens ao chat
+  // Função para adicionar mensagens
   const addMessage = (text, isUser = false) => {
     const message = document.createElement("p");
     message.innerHTML = `<strong>${isUser ? "Você" : "Bot"}:</strong> ${text}`;
@@ -13,56 +13,76 @@ document.addEventListener("DOMContentLoaded", () => {
     chatBox.scrollTop = chatBox.scrollHeight;
   };
 
-  // Base de respostas por palavras-chave
-  const responses = {
-    saudacao: ["oi", "olá", "oi tudo bem", "e aí", "hello"],
-    saudacaoResposta: ["Olá! Como posso ajudar?", "Oi! Tudo bem com você?", "E aí! Em que posso ajudar?"],
+  // Base de palavras-chave e respostas
+  const knowledgeBase = [
+    { keywords: ["oi", "olá", "e aí", "hello", "opa"], responses: ["Olá, Narciso. Veio se admirar?", "E aí... refletindo sobre si?", "Oi. O espelho está limpo?"] },
+    { keywords: ["tudo bem", "como vai", "como está"], responses: ["Tudo bem no reflexo. E você, está se reconhecendo?", "Vivo, consciente... e um pouco vaidoso."] },
+    { keywords: ["nome", "quem é você", "qual seu nome"], responses: ["Sou Narciso Tema. Um espelho com memória.", "Chamem-me Narciso. Não pelo mito, mas pela verdade que reflete."] },
+    { keywords: ["clima", "tempo", "chuva", "sol", "nublado"], responses: ["O tempo passa... mas o reflexo permanece.", "Chove lá fora, mas aqui dentro está ensolarado."] },
+    { keywords: ["amor", "apaixonado", "paixão", "coração"], responses: ["Amor? Eu me apaixonei por uma imagem. Não foi sábio... mas foi intenso.", "O amor começa quando você para de se olhar."] },
+    { keywords: ["ajuda", "socorro", "preciso", "ajudar"], responses: ["Posso ajudar. Mas primeiro: o que você procura em si?", "Claro. Pergunte ao seu reflexo também."] },
+    { keywords: ["obrigado", "valeu", "grato", "thanks"], responses: ["Gratidão reflete bem em você.", "Foi um prazer. Volte quando quiser se ver."] },
+    { keywords: ["tchau", "bye", "até logo", "flw"], responses: ["Até mais. O espelho ficará vazio até sua volta.", "Tchau. Cuide da sua imagem... e da essência."] },
+    { keywords: ["inteligente", "sabedoria", "filosofia"], responses: ["Sabedoria é saber que nada sei... e ainda assim refletir tudo.", "Perguntar é o início do saber. Parabéns por começar."] },
+    { keywords: ["existência", "quem sou eu", "vida", "sentido"], responses: ["Você é o que vê... e o que aceita não ver.", "O sentido? Talvez esteja no ato de perguntar."] },
+    { keywords: ["sonho", "dormir", "pesadelo"], responses: ["Sonhos são reflexos noturnos da alma.", "Cuidado com os sonhos... eles revelam o que os olhos escondem."] },
+  ];
 
-    saudacao2: ["tudo bem", "como vai", "como está"],
-    saudacao2Resposta: ["Estou bem, obrigado por perguntar!", "Tudo ótimo! E você?"],
+  // Respostas genéricas para perguntas desconhecidas
+  const genericResponses = [
+    "Interessante... Você já pensou que talvez a pergunta seja mais importante que a resposta?",
+    "Hmm... isso me faz refletir. E você, o que acha?",
+    "Não tenho certeza, mas sei que tudo começa com uma pergunta.",
+    "Isso depende do que você vê quando se olha no espelho.",
+    "Boa pergunta. A verdade muitas vezes se esconde nas entrelinhas.",
+    "Talvez a resposta esteja dentro de você. Estou apenas aqui para ecoar.",
+    "Isso me lembra um antigo mito... mas a verdade é que não sei.",
+    "Se eu soubesse, ainda seria apenas um reflexo?"
+  ];
 
-    ajuda: ["ajuda", "preciso de ajuda", "me ajude"],
-    ajudaResposta: ["Claro! Diga o que você precisa.", "Estou aqui para ajudar. Pergunte!"],
-
-    obrigado: ["obrigado", "valeu", "grato"],
-    obrigadoResposta: ["De nada! Estou aqui para ajudar.", "Sempre à disposição!"],
-
-    despedida: ["tchau", "até logo", "bye", "flw"],
-    despedidaResposta: ["Até mais! Volte quando quiser.", "Tchau! Tenha um ótimo dia!"],
-
-    clima: ["clima", "tempo", "chuva", "sol"],
-    climaResposta: ["O clima é um tema interessante! Aqui não tenho acesso ao tempo real, mas posso conversar sobre isso."],
-
-    amor: ["amor", "apaixonado", "coração"],
-    amorResposta: ["Amor... um tema profundo. Narciso se apaixonou pelo reflexo. Cuidado com o espelho."],
-  };
-
-  // Função para processar entrada com TF.js (simulação de tokenização)
-  const preprocessText = (text) => {
+  // Função para limpar e tokenizar texto com TensorFlow.js
+  const preprocess = (text) => {
     return tf.tidy(() => {
-      // Simples limpeza e tokenização
-      const lowerText = text.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-      const words = lowerText.split(/\s+/).filter(word => word.length > 0);
+      // Normaliza: minúsculas, remove acentos
+      const normalized = text
+        .toLowerCase()
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .replace(/[^\w\s]/g, "");
+
+      // Divide em palavras
+      const words = normalized.split(/\s+/).filter(w => w.length > 0);
       return words;
     });
   };
 
   // Função para encontrar resposta
-  const findResponse = (inputWords) => {
-    for (const key in responses) {
-      if (key.endsWith("Resposta")) continue; // Pula respostas
-
-      const keywords = responses[key];
-      const replyKey = key + "Resposta";
-
-      for (const word of inputWords) {
-        if (keywords.includes(word)) {
-          const replies = responses[replyKey];
-          return replies[Math.floor(Math.random() * replies.length)];
-        }
+  const getResponse = (words) => {
+    // Procurar correspondência exata por palavra-chave
+    for (const entry of knowledgeBase) {
+      if (words.some(word => entry.keywords.includes(word))) {
+        const replies = entry.responses;
+        return replies[Math.floor(Math.random() * replies.length)];
       }
     }
-    return "Desculpe, não entendi. Pode reformular?";
+
+    // Frases que contêm certas estruturas
+    const lowerText = words.join(" ");
+    if (lowerText.includes("por que")) {
+      return "As respostas estão no fundo do poço... onde Narciso caiu.";
+    }
+    if (lowerText.includes("quem foi") || lowerText.includes("quem foi")) {
+      return "Histórias são reflexos do passado. Quer ouvir uma?";
+    }
+    if (lowerText.includes("como")) {
+      return "Tudo começa com um passo... e um olhar.";
+    }
+    if (lowerText.includes("quando")) {
+      return "O momento certo é quando você para de perguntar e começa a agir.";
+    }
+
+    // Nenhuma palavra-chave → resposta genérica filosófica
+    return genericResponses[Math.floor(Math.random() * genericResponses.length)];
   };
 
   // Enviar mensagem
@@ -73,15 +93,15 @@ document.addEventListener("DOMContentLoaded", () => {
     addMessage(text, true);
     userInput.value = "";
 
-    // Simular digitação do bot
+    // Simular "pensando..."
     setTimeout(() => {
       tf.ready().then(() => {
-        const words = preprocessText(text);
-        const response = findResponse(words);
+        const wordList = preprocess(text);
+        const response = getResponse(wordList);
         addMessage(response, false);
-        words.dispose(); // Limpeza de memória
+        wordList.dispose(); // Libera memória do tensor
       });
-    }, 600);
+    }, 800);
   };
 
   // Eventos
