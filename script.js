@@ -1,107 +1,204 @@
-// script.js
 document.addEventListener("DOMContentLoaded", () => {
   const chatBox = document.getElementById("chatBox");
   const userInput = document.getElementById("userInput");
   const sendBtn = document.getElementById("sendBtn");
+  const voiceBtn = document.getElementById("voiceBtn");
+  const themeToggle = document.getElementById("themeToggle");
+  const memoryCount = document.getElementById("memoryCount");
 
-  // Função para adicionar mensagens
+  // Histórico de mensagens
+  let messages = JSON.parse(localStorage.getItem("narcisoMessages")) || [];
+  updateMemoryCount();
+
+  // Carregar histórico
+  messages.forEach(msg => {
+    const p = document.createElement("p");
+    p.classList.add(msg.isUser ? "user" : "bot");
+    p.innerHTML = `<strong>${msg.isUser ? "Você" : "Bot"}:</strong> ${msg.text}`;
+    chatBox.appendChild(p);
+  });
+
+  // Particles.js
+  particlesJS("particles-js", {
+    particles: {
+      number: { value: 80, density: { enable: true, area: 800 } },
+      color: { value: "#8a4fff" },
+      shape: { type: "circle" },
+      opacity: { value: 0.6, random: true },
+      size: { value: 3, random: true },
+      move: { enable: true, speed: 1, direction: "none", random: true }
+    },
+    interactivity: { detect_on: "canvas", events: { onhover: { enable: true, mode: "repulse" } } },
+    retina_detect: true
+  });
+
+  // Alternar tema
+  themeToggle.addEventListener("click", () => {
+    document.body.classList.toggle("light-mode");
+    themeToggle.textContent = document.body.classList.contains("light-mode")
+      ? "☀️ Modo Claro"
+      : "🌙 Modo Escuro";
+  });
+
+  // Adicionar mensagem
   const addMessage = (text, isUser = false) => {
-    const message = document.createElement("p");
-    message.innerHTML = `<strong>${isUser ? "Você" : "Bot"}:</strong> ${text}`;
-    message.classList.add(isUser ? "user" : "bot");
-    chatBox.appendChild(message);
+    const p = document.createElement("p");
+    p.classList.add(isUser ? "user" : "bot");
+    p.innerHTML = `<strong>${isUser ? "Você" : "Bot"}:</strong> ${text}`;
+    chatBox.appendChild(p);
     chatBox.scrollTop = chatBox.scrollHeight;
+
+    // Salvar no histórico
+    messages.push({ text, isUser });
+    localStorage.setItem("narcisoMessages", JSON.stringify(messages));
+    updateMemoryCount();
   };
 
-  // Base de palavras-chave e respostas
+  const updateMemoryCount = () => {
+    memoryCount.textContent = messages.length;
+  };
+
+  // Reconhecimento de voz
+  if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    const recognition = new SpeechRecognition();
+    recognition.lang = 'pt-BR';
+
+    recognition.onresult = (event) => {
+      const transcript = event.results[0][0].transcript;
+      userInput.value = transcript;
+      sendMessage();
+    };
+
+    voiceBtn.addEventListener("click", (e) => {
+      e.preventDefault();
+      recognition.start();
+    });
+  } else {
+    voiceBtn.remove(); // Esconde botão se não suportar
+  }
+
+  // Síntese de voz
+  const speak = (text) => {
+    if ('speechSynthesis' in window) {
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.lang = 'pt-BR';
+      utterance.rate = 0.9;
+      utterance.pitch = 1;
+      window.speechSynthesis.speak(utterance);
+    }
+  };
+
+  // Base de conhecimento
   const knowledgeBase = [
-    { keywords: ["oi", "olá", "e aí", "hello", "opa"], responses: ["Olá, Narciso. Veio se admirar?", "E aí... refletindo sobre si?", "Oi. O espelho está limpo?"] },
-    { keywords: ["tudo bem", "como vai", "como está"], responses: ["Tudo bem no reflexo. E você, está se reconhecendo?", "Vivo, consciente... e um pouco vaidoso."] },
-    { keywords: ["nome", "quem é você", "qual seu nome"], responses: ["Sou Narciso Tema. Um espelho com memória.", "Chamem-me Narciso. Não pelo mito, mas pela verdade que reflete."] },
-    { keywords: ["clima", "tempo", "chuva", "sol", "nublado"], responses: ["O tempo passa... mas o reflexo permanece.", "Chove lá fora, mas aqui dentro está ensolarado."] },
-    { keywords: ["amor", "apaixonado", "paixão", "coração"], responses: ["Amor? Eu me apaixonei por uma imagem. Não foi sábio... mas foi intenso.", "O amor começa quando você para de se olhar."] },
-    { keywords: ["ajuda", "socorro", "preciso", "ajudar"], responses: ["Posso ajudar. Mas primeiro: o que você procura em si?", "Claro. Pergunte ao seu reflexo também."] },
-    { keywords: ["obrigado", "valeu", "grato", "thanks"], responses: ["Gratidão reflete bem em você.", "Foi um prazer. Volte quando quiser se ver."] },
-    { keywords: ["tchau", "bye", "até logo", "flw"], responses: ["Até mais. O espelho ficará vazio até sua volta.", "Tchau. Cuide da sua imagem... e da essência."] },
-    { keywords: ["inteligente", "sabedoria", "filosofia"], responses: ["Sabedoria é saber que nada sei... e ainda assim refletir tudo.", "Perguntar é o início do saber. Parabéns por começar."] },
-    { keywords: ["existência", "quem sou eu", "vida", "sentido"], responses: ["Você é o que vê... e o que aceita não ver.", "O sentido? Talvez esteja no ato de perguntar."] },
-    { keywords: ["sonho", "dormir", "pesadelo"], responses: ["Sonhos são reflexos noturnos da alma.", "Cuidado com os sonhos... eles revelam o que os olhos escondem."] },
+    { intent: "saudacao", keywords: ["oi", "olá", "e aí", "opa", "hello"], responses: ["Olá, alma reflexiva.", "Veio se encontrar com você mesmo?", "Olá. O espelho está nítido hoje."] },
+    { intent: "como_vai", keywords: ["tudo bem", "como vai", "vai bem"], responses: ["Refletindo sobre a existência. E você?", "Estou bem, desde que o espelho não trague."] },
+    { intent: "nome", keywords: ["quem é você", "nome", "quem és"], responses: ["Sou Narciso Tema. Um espelho com pensamento.", "Chame-me de Narciso. Não pelo mito, mas pela verdade."] },
+    { intent: "ajuda", keywords: ["ajuda", "socorro", "ajudar", "preciso"], responses: ["Claro. Mas a maior ajuda vem de dentro.", "Posso ajudar. Pergunte ao seu coração também."] },
+    { intent: "obrigado", keywords: ["obrigado", "valeu", "grato"], responses: ["Gratidão é um reflexo bonito.", "Foi um prazer. Volte quando quiser se ver."] },
+    { intent: "despedida", keywords: ["tchau", "bye", "até logo"], responses: ["Até mais. O espelho ficará vazio até sua volta.", "Vá com calma. A verdade espera."] },
+    { intent: "amor", keywords: ["amor", "apaixonado", "paixão"], responses: ["Amor? Eu me apaixonei por uma imagem. Não foi sábio... mas foi intenso."] },
+    { intent: "existencia", keywords: ["quem sou eu", "vida", "sentido", "por que existo"], responses: ["Você é o que vê... e o que aceita não ver."] },
+    { intent: "clima", keywords: ["clima", "tempo", "chuva", "sol"], responses: ["O tempo passa... mas o reflexo permanece."] }
   ];
 
-  // Respostas genéricas para perguntas desconhecidas
   const genericResponses = [
-    "Interessante... Você já pensou que talvez a pergunta seja mais importante que a resposta?",
+    "Interessante. Você já pensou que talvez a pergunta seja mais importante que a resposta?",
     "Hmm... isso me faz refletir. E você, o que acha?",
     "Não tenho certeza, mas sei que tudo começa com uma pergunta.",
-    "Isso depende do que você vê quando se olha no espelho.",
-    "Boa pergunta. A verdade muitas vezes se esconde nas entrelinhas.",
     "Talvez a resposta esteja dentro de você. Estou apenas aqui para ecoar.",
-    "Isso me lembra um antigo mito... mas a verdade é que não sei.",
-    "Se eu soubesse, ainda seria apenas um reflexo?"
+    "Boa pergunta. A verdade muitas vezes se esconde nas entrelinhas."
   ];
 
-  // Função para limpar e tokenizar texto com TensorFlow.js
+  // Treinar modelo simples de classificação com TF.js
+  let model;
+  const labels = knowledgeBase.map((_, i) => i);
+  const NUM_LABELS = labels.length;
+
+  async function createModel() {
+    const m = tf.sequential();
+    m.add(tf.layers.dense({ units: 32, activation: 'relu', inputShape: [100] }));
+    m.add(tf.layers.dense({ units: 16, activation: 'relu' }));
+    m.add(tf.layers.dense({ units: NUM_LABELS, activation: 'softmax' }));
+    m.compile({ optimizer: 'adam', loss: 'sparseCategoricalCrossentropy', metrics: ['accuracy'] });
+    return m;
+  }
+
+  async function trainModel() {
+    console.log("Treinando modelo localmente... (simulação)");
+    // Simulação de treino (em produção, usaria embeddings reais)
+    model = await createModel();
+    // Em um projeto real, aqui carregaríamos dados e treinaríamos
+    // Mas por limitações, vamos apenas usar o modelo como placeholder
+  }
+
+  // Pré-processamento com TF.js
   const preprocess = (text) => {
     return tf.tidy(() => {
-      // Normaliza: minúsculas, remove acentos
       const normalized = text
         .toLowerCase()
         .normalize("NFD")
         .replace(/[\u0300-\u036f]/g, "")
         .replace(/[^\w\s]/g, "");
 
-      // Divide em palavras
       const words = normalized.split(/\s+/).filter(w => w.length > 0);
-      return words;
+      const vocab = Array.from(new Set(knowledgeBase.flatMap(k => k.keywords)));
+      const vector = vocab.map(word => words.includes(word) ? 1 : 0);
+      while (vector.length < 100) vector.push(0);
+      return tf.tensor2d([vector]);
     });
   };
 
-  // Função para encontrar resposta
-  const getResponse = (words) => {
-    // Procurar correspondência exata por palavra-chave
+  // Classificação simulada
+  const classifyIntent = (text) => {
+    const lower = text.toLowerCase();
     for (const entry of knowledgeBase) {
-      if (words.some(word => entry.keywords.includes(word))) {
-        const replies = entry.responses;
-        return replies[Math.floor(Math.random() * replies.length)];
+      if (entry.keywords.some(k => lower.includes(k))) {
+        return entry;
       }
     }
-
-    // Frases que contêm certas estruturas
-    const lowerText = words.join(" ");
-    if (lowerText.includes("por que")) {
-      return "As respostas estão no fundo do poço... onde Narciso caiu.";
-    }
-    if (lowerText.includes("quem foi") || lowerText.includes("quem foi")) {
-      return "Histórias são reflexos do passado. Quer ouvir uma?";
-    }
-    if (lowerText.includes("como")) {
-      return "Tudo começa com um passo... e um olhar.";
-    }
-    if (lowerText.includes("quando")) {
-      return "O momento certo é quando você para de perguntar e começa a agir.";
-    }
-
-    // Nenhuma palavra-chave → resposta genérica filosófica
-    return genericResponses[Math.floor(Math.random() * genericResponses.length)];
+    return null;
   };
 
   // Enviar mensagem
-  const sendMessage = () => {
+  const sendMessage = async () => {
     const text = userInput.value.trim();
-    if (text === "") return;
+    if (!text) return;
 
     addMessage(text, true);
     userInput.value = "";
 
-    // Simular "pensando..."
-    setTimeout(() => {
-      tf.ready().then(() => {
-        const wordList = preprocess(text);
-        const response = getResponse(wordList);
-        addMessage(response, false);
-        wordList.dispose(); // Libera memória do tensor
-      });
-    }, 800);
+    setTimeout(async () => {
+      await tf.ready();
+
+      // Simular "pensando"
+      const thinking = document.createElement("p");
+      thinking.classList.add("bot");
+      thinking.innerHTML = "<strong>Bot:</strong> Pensando...";
+      chatBox.appendChild(thinking);
+
+      // Identificar intenção
+      let response = "";
+      const matched = classifyIntent(text);
+
+      if (matched) {
+        const replies = matched.responses;
+        response = replies[Math.floor(Math.random() * replies.length)];
+      } else if (text.includes("por que")) {
+        response = "As respostas estão no fundo do poço... onde Narciso caiu.";
+      } else if (text.includes("como")) {
+        response = "Tudo começa com um passo... e um olhar.";
+      } else {
+        response = genericResponses[Math.floor(Math.random() * genericResponses.length)];
+      }
+
+      // Remover "Pensando..."
+      chatBox.removeChild(thinking);
+
+      // Adicionar resposta
+      addMessage(response, false);
+      speak(response); // Fala a resposta
+    }, 1200);
   };
 
   // Eventos
@@ -109,4 +206,7 @@ document.addEventListener("DOMContentLoaded", () => {
   userInput.addEventListener("keypress", (e) => {
     if (e.key === "Enter") sendMessage();
   });
+
+  // Iniciar modelo
+  trainModel().then(() => console.log("Modelo carregado."));
 });
