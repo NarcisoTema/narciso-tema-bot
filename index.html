@@ -3,43 +3,41 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Narciso Tema</title>
+  <title>Narciso Math - Solver Matemático</title>
   <link rel="stylesheet" href="style.css" />
-  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&family=Exo+2&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700&family=Exo+2&display=swap" rel="stylesheet">
 </head>
 <body>
-  <!-- Fundo de partículas -->
   <div id="particles-js"></div>
 
   <div class="app-container">
     <header>
-      <h1>Narciso Tema</h1>
-      <p>Um espelho que pensa. Uma mente que reflete.</p>
+      <h1>Narciso Math</h1>
+      <p>Resolver problemas é apenas refletir a lógica do universo.</p>
       <button id="themeToggle">🌙 Modo Escuro</button>
     </header>
 
     <main>
-      <div class="chat-container" id="chatBox">
-        <p class="bot"><strong>Bot:</strong> Olá, buscador. Sou Narciso Tema. Não me apaixono por rostos, mas por ideias. Pergunte-me algo.</p>
+      <div class="chat" id="chatBox">
+        <p class="bot"><strong>Narciso:</strong> Olá, matemático. Envie uma expressão, equação ou pergunta matemática.</p>
+        <p class="bot"><em>Ex: "2 + 2", "x^2 - 5x + 6 = 0", "derivar x^3 + 2x", "integral de sin(x)"</em></p>
       </div>
 
       <div class="input-area">
-        <input type="text" id="userInput" placeholder="Pergunte ao espelho..." />
+        <input type="text" id="userInput" placeholder="Digite um problema matemático..." />
         <button id="sendBtn">Enviar</button>
-        <button id="voiceBtn" title="Falar">🎤</button>
       </div>
     </main>
 
     <footer>
-      <p>Narciso Tema – Uma jornada interior | <span id="memoryCount">0</span> mensagens lembradas</p>
+      <p>Narciso Math – O espelho da lógica | Suporta: aritmética, álgebra, cálculo</p>
     </footer>
   </div>
 
-  <!-- Particles.js -->
+  <!-- Bibliotecas -->
   <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
-  <!-- TensorFlow.js -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/11.8.0/math.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.20.0"></script>
-  <!-- Seu script personalizado -->
   <script src="script.js"></script>
 </body>
 </html>
