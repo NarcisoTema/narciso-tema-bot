@@ -3,9 +3,18 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Narciso Math - Solver Matemático</title>
+  <title>Narciso Math</title>
   <link rel="stylesheet" href="style.css" />
+  <!-- Fontes -->
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700&family=Exo+2&display=swap" rel="stylesheet">
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <!-- Particles.js -->
+  <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+  <!-- Math.js -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/11.8.0/math.min.js"></script>
+  <!-- TensorFlow.js -->
+  <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.20.0"></script>
 </head>
 <body>
   <div id="particles-js"></div>
@@ -13,31 +22,28 @@
   <div class="app-container">
     <header>
       <h1>Narciso Math</h1>
-      <p>Resolver problemas é apenas refletir a lógica do universo.</p>
+      <p>Refletindo a lógica do universo, uma equação por vez.</p>
       <button id="themeToggle">🌙 Modo Escuro</button>
     </header>
 
     <main>
       <div class="chat" id="chatBox">
-        <p class="bot"><strong>Narciso:</strong> Olá, matemático. Envie uma expressão, equação ou pergunta matemática.</p>
-        <p class="bot"><em>Ex: "2 + 2", "x^2 - 5x + 6 = 0", "derivar x^3 + 2x", "integral de sin(x)"</em></p>
+        <p class="bot"><strong>Narciso:</strong> Olá, pensador. Sou um espelho com memória matemática. Pergunte algo.</p>
+        <p class="bot"><em>Ex: "2+2", "derivar x^2", "gráfico de sin(x)", "x^2 - 5x + 6 = 0"</em></p>
       </div>
 
       <div class="input-area">
-        <input type="text" id="userInput" placeholder="Digite um problema matemático..." />
-        <button id="sendBtn">Enviar</button>
+        <input type="text" id="userInput" placeholder="Digite um problema matemático ou pergunta..." />
+        <button id="sendBtn">📤</button>
       </div>
     </main>
 
     <footer>
-      <p>Narciso Math – O espelho da lógica | Suporta: aritmética, álgebra, cálculo</p>
+      <p>Narciso Math – O reflexo da razão | Suporta álgebra, cálculo, gráficos e filosofia</p>
     </footer>
   </div>
 
-  <!-- Bibliotecas -->
-  <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/11.8.0/math.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.20.0"></script>
+  <!-- Seu script -->
   <script src="script.js"></script>
 </body>
 </html>
